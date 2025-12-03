@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PyGMT 探險隊：用程式碼畫出全世界</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;700&family=Fredoka:wght@400;600&family=Fira+Code:wght@500&display=swap" rel="stylesheet">
+
+    <style>
+        /* 字體設定：Fredoka 適合標題，圓潤可愛；Noto Sans 適合內文 */
+        h1, h2, h3, .fun-font { font-family: 'Fredoka', sans-serif; }
+        body { font-family: 'Noto Sans TC', sans-serif; background-color: #f0f9ff; }
+        .code-font { font-family: 'Fira Code', monospace; }
+        
+        /* 自定義動畫 */
+        .float-anim { animation: floating 3s ease-in-out infinite; }
+        @keyframes floating {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        
+        /* 模擬地圖的圖層疊加 */
+        .map-layer { transition: all 0.5s ease; position: absolute; inset: 0; }
+        
+        /* 程式碼區塊樣式 */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.8);
+        }
+    </style>
+</head>
+<body class="text-slate-700 overflow-x-hidden">
+
+    <nav class="fixed w-full z-50 bg-white/90 backdrop-blur shadow-sm py-3">
+        <div class="max-w-6xl mx-auto px-4 flex justify-between items-center">
+            <div class="flex items-center gap-2 text-blue-600">
+                <i class="fa-solid fa-earth-asia text-3xl"></i>
+                <span class="fun-font text-2xl font-bold tracking-wide">PyGMT 探險隊</span>
+            </div>
+            <div class="hidden md:flex gap-6 font-bold text-slate-500">
+                <a href="#intro" class="hover:text-blue-500 transition">這是什麼？</a>
+                <a href="#video-class" class="hover:text-blue-500 transition">看影片學</a>
+                <a href="#lab" class="hover:text-blue-500 transition">魔法實驗室</a>
+                <a href="#pro" class="hover:text-blue-500 transition">專家模式</a>
+            </div>
+        </div>
+    </nav>
+
+    <header class="pt-32 pb-20 px-4 text-center relative overflow-hidden">
+        <div class="absolute top-20 left-10 text-yellow-400 text-6xl opacity-20 rotate-12"><i class="fa-solid fa-sun"></i></div>
+        <div class="absolute bottom-20 right-10 text-blue-300 text-8xl opacity-20 -rotate-12"><i class="fa-solid fa-water"></i></div>
+
+        <div class="max-w-4xl mx-auto relative z-10" data-aos="zoom-in">
+            <span class="bg-blue-100 text-blue-600 px-4 py-2 rounded-full font-bold text-sm mb-4 inline-block">給未來的地球科學家 🌍</span>
+            <h1 class="text-5xl md:text-7xl font-bold text-slate-800 mb-6 leading-tight">
+                把整個地球<br><span class="text-blue-500">裝進你的電腦裡！</span>
+            </h1>
+            <p class="text-xl md:text-2xl text-slate-500 mb-10 max-w-2xl mx-auto">
+                你不需要畫筆，也不需要墨水。<br>只要打幾行神秘的字（程式碼），就能畫出喜馬拉雅山、太平洋，甚至是地震波！
+            </p>
+            <a href="#intro" class="bg-blue-500 hover:bg-blue-600 text-white text-xl font-bold py-4 px-10 rounded-2xl shadow-lg hover:shadow-blue-500/30 transition transform hover:-translate-y-1 inline-flex items-center gap-3">
+                <i class="fa-solid fa-rocket"></i> 開始探險
+            </a>
+        </div>
+    </header>
+
+    <section id="intro" class="py-20 bg-white">
+        <div class="max-w-5xl mx-auto px-6">
+            <div class="grid md:grid-cols-2 gap-12 items-center">
+                <div data-aos="fade-right">
+                    <h2 class="text-4xl font-bold mb-6 text-slate-800">PyGMT 是什麼？🤔</h2>
+                    <p class="text-lg leading-relaxed mb-4">
+                        想像你有一個超級機器人管家，它的名字叫 <strong>GMT</strong>。它非常會畫地圖，但是它的操作介面很複雜，只有科學家看得懂。
+                    </p>
+                    <p class="text-lg leading-relaxed mb-4">
+                        這時候，<strong>PyGMT</strong> 出現了！它就像是 GMT 的翻譯機。
+                    </p>
+                    <div class="bg-yellow-50 p-6 rounded-2xl border-l-8 border-yellow-400 my-6">
+                        <h4 class="font-bold text-yellow-700 mb-2">簡單來說：</h4>
+                        <p>你用簡單的 <strong>Python</strong> 語言告訴 PyGMT：「我要一張台灣地圖！」<br>
+                        PyGMT 就會幫你指揮機器人，畫出一張超精美的地圖給你。</p>
+                    </div>
+                </div>
+                <div class="relative" data-aos="fade-left">
+                    <div class="bg-blue-50 rounded-3xl p-8 flex flex-col items-center gap-4 text-center border-4 border-blue-100">
+                        <div class="flex items-center gap-4 text-4xl">
+                            <div class="flex flex-col items-center">
+                                <i class="fa-brands fa-python text-blue-500 mb-2"></i>
+                                <span class="text-sm font-bold">你 (Python)</span>
+                            </div>
+                            <i class="fa-solid fa-arrow-right text-slate-300"></i>
+                            <div class="bg-white p-3 rounded-xl shadow-md font-bold text-blue-600">PyGMT <br><span class="text-xs text-slate-400">翻譯機</span></div>
+                            <i class="fa-solid fa-arrow-right text-slate-300"></i>
+                            <div class="flex flex-col items-center">
+                                <i class="fa-solid fa-robot text-slate-700 mb-2"></i>
+                                <span class="text-sm font-bold">畫圖機器人</span>
+                            </div>
+                        </div>
+                        <div class="mt-4 bg-white p-2 rounded shadow-sm w-full">
+                            <img src="https://docs.pygmt.org/latest/_images/gallery_03_inset_001.png" alt="Map Example" class="rounded w-full object-cover h-40 opacity-80">
+                            <p class="text-xs text-slate-400 mt-2">最後產出：精美的地圖</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="video-class" class="py-20 bg-slate-800 text-white">
+        <div class="max-w-6xl mx-auto px-6">
+            <div class="text-center mb-12" data-aos="fade-up">
+                <span class="text-blue-300 font-bold tracking-wider">VIDEO TUTORIAL</span>
+                <h2 class="text-4xl font-bold mt-2">3 分鐘學會畫第一張圖</h2>
+                <p class="text-slate-400 mt-4">我們精選了一個超棒的教學影片，帶你從零開始。</p>
+            </div>
+
+            <div class="grid lg:grid-cols-3 gap-8">
+                <div class="lg:col-span-2 bg-black rounded-2xl overflow-hidden shadow-2xl border-4 border-slate-700" data-aos="fade-right">
+                    <iframe class="w-full aspect-video" src="https://www.youtube.com/embed/Kb6TYvZcI_c?si=WnZwtmfO4CpEZC4t" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                </div>
+
+                <div class="bg-slate-700/50 p-6 rounded-2xl backdrop-blur-sm border border-slate-600" data-aos="fade-left">
+                    <h3 class="text-xl font-bold mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-pen-nib text-yellow-400"></i> 研究員筆記
+                    </h3>
+                    <ul class="space-y-4 text-slate-300 text-sm">
+                        <li class="flex gap-3">
+                            <span class="bg-blue-600 h-6 w-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0">1</span>
+                            <div>
+                                <strong class="text-white">import pygmt</strong>
+                                <p>就像在遊戲裡裝備道具，第一步一定要把 PyGMT 叫出來。</p>
+                            </div>
+                        </li>
+                        <li class="flex gap-3">
+                            <span class="bg-blue-600 h-6 w-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0">2</span>
+                            <div>
+                                <strong class="text-white">fig = pygmt.Figure()</strong>
+                                <p>這是在說：「給我一張白紙！」準備開始畫圖。</p>
+                            </div>
+                        </li>
+                        <li class="flex gap-3">
+                            <span class="bg-blue-600 h-6 w-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0">3</span>
+                            <div>
+                                <strong class="text-white">fig.coast(...)</strong>
+                                <p>这是最常用的咒語！用來畫海岸線。你可以設定要畫哪裡（region）、用什麼投影（projection）。</p>
+                            </div>
+                        </li>
+                        <li class="flex gap-3">
+                            <span class="bg-blue-600 h-6 w-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0">4</span>
+                            <div>
+                                <strong class="text-white">fig.show()</strong>
+                                <p>大功告成，把畫好的圖展示出來！</p>
+                            </div>
+                        </li>
+                    </ul>
+                    <div class="mt-6 pt-6 border-t border-slate-600">
+                        <a href="https://www.pygmt.org/latest/tutorials/index.html" target="_blank" class="text-blue-300 hover:text-white transition text-sm flex items-center gap-2">
+                            想要更多教學？去官網看看 <i class="fa-solid fa-external-link-alt"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="lab" class="py-20 bg-blue-50" x-data="mapLab()">
+        <div class="max-w-6xl mx-auto px-6">
+            <div class="text-center mb-10">
+                <h2 class="text-4xl font-bold text-slate-800 mb-2">🧙‍♂️ 魔法實驗室</h2>
+                <p class="text-slate-600">點擊下方的按鈕，看看程式碼和地圖會發生什麼變化！</p>
+            </div>
+
+            <div class="flex flex-col lg:flex-row gap-8">
+                <div class="lg:w-1/2 space-y-6" data-aos="fade-up">
+                    
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                        <h3 class="font-bold text-lg mb-4 text-slate-700">1. 選擇你的視角 (Projection)</h3>
+                        <div class="flex gap-2 mb-6">
+                            <button @click="projection = 'Mercator'" :class="projection === 'Mercator' ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-600'" class="flex-1 py-2 rounded-lg font-bold text-sm transition">
+                                🗺️ 平面地圖
+                            </button>
+                            <button @click="projection = 'Orthographic'" :class="projection === 'Orthographic' ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-600'" class="flex-1 py-2 rounded-lg font-bold text-sm transition">
+                                🌍 地球儀
+                            </button>
+                        </div>
+
+                        <h3 class="font-bold text-lg mb-4 text-slate-700">2. 選擇地圖內容 (Content)</h3>
+                        <div class="flex gap-2 mb-6">
+                            <button @click="content = 'Simple'" :class="content === 'Simple' ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-600'" class="flex-1 py-2 rounded-lg font-bold text-sm transition">
+                                簡約線條
+                            </button>
+                            <button @click="content = 'Relief'" :class="content === 'Relief' ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-600'" class="flex-1 py-2 rounded-lg font-bold text-sm transition">
+                                真實地形
+                            </button>
+                        </div>
+
+                        <h3 class="font-bold text-lg mb-4 text-slate-700">3. 加上特效 (Overlay)</h3>
+                        <div class="flex gap-2">
+                            <button @click="overlay = !overlay" :class="overlay ? 'bg-red-500 text-white' : 'bg-slate-100 text-slate-600'" class="flex-1 py-2 rounded-lg font-bold text-sm transition">
+                                <i class="fa-solid fa-house-crack"></i> 顯示地震
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-900 rounded-2xl p-6 shadow-xl relative overflow-hidden group">
+                        <div class="absolute top-0 left-0 w-full h-8 bg-slate-800 flex items-center px-4 space-x-2">
+                            <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                            <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+                            <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                            <span class="text-xs text-slate-400 ml-4">script.py</span>
+                        </div>
+                        <pre class="mt-4 text-sm code-font text-blue-300 overflow-x-auto"><code x-text="generateCode()"></code></pre>
+                        <div class="absolute bottom-4 right-4 text-slate-500 text-xs">PyGMT v0.10.0</div>
+                    </div>
+                </div>
+
+                <div class="lg:w-1/2" data-aos="fade-up" data-aos-delay="200">
+                    <div class="bg-white p-2 rounded-2xl shadow-2xl border-4 border-slate-800 h-full min-h-[400px] relative overflow-hidden flex items-center justify-center">
+                        <div class="relative transition-all duration-700 ease-in-out"
+                             :class="projection === 'Orthographic' ? 'w-64 h-64 rounded-full overflow-hidden shadow-inner ring-4 ring-black/10' : 'w-full h-full rounded-lg'">
+                            
+                            <div class="absolute inset-0 transition-colors duration-500"
+                                 :class="content === 'Relief' ? 'bg-[#2c5364]' : 'bg-[#e0f7fa]'">
+                                 <div x-show="content === 'Relief'" class="absolute inset-0 bg-gradient-to-tr from-green-800 via-yellow-600 to-white opacity-80 mix-blend-overlay"></div>
+                            </div>
+
+                            <div class="absolute inset-0 flex items-center justify-center opacity-60">
+                                <i class="fa-solid fa-earth-americas text-[10rem] transition-colors duration-500"
+                                   :class="content === 'Relief' ? 'text-transparent' : 'text-slate-400'"></i>
+                            </div>
+
+                            <template x-if="overlay">
+                                <div class="absolute inset-0 animate-pulse">
+                                    <div class="absolute top-1/3 left-1/3 w-3 h-3 bg-red-600 rounded-full border border-white shadow-lg"></div>
+                                    <div class="absolute top-1/2 right-1/4 w-4 h-4 bg-red-600 rounded-full border border-white shadow-lg"></div>
+                                    <div class="absolute bottom-1/4 left-1/2 w-2 h-2 bg-red-600 rounded-full border border-white shadow-lg"></div>
+                                </div>
+                            </template>
+                            
+                            <div class="absolute bottom-2 right-2 text-[10px] text-slate-500 bg-white/50 px-1 rounded">Generated by PyGMT</div>
+                        </div>
+                    </div>
+                    <p class="text-center text-sm text-slate-400 mt-4">
+                        <i class="fa-solid fa-circle-info"></i> 右側僅為互動示意圖，實際 PyGMT 產生的圖片解析度會高非常多！
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="pro" class="py-20 bg-white">
+        <div class="max-w-5xl mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-bold mb-4">為什麼科學家都愛用？</h2>
+                <div class="w-20 h-1 bg-blue-500 mx-auto rounded-full"></div>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8 text-center">
+                <div class="p-6 bg-slate-50 rounded-xl hover:shadow-lg transition group">
+                    <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-blue-600 transition">
+                        <i class="fa-solid fa-layer-group text-2xl text-blue-600 group-hover:text-white transition"></i>
+                    </div>
+                    <h3 class="font-bold text-xl mb-2">圖層超靈活</h3>
+                    <p class="text-slate-500 text-sm">就像做三明治，想疊多少層數據都可以：地形、河流、城市、斷層線...</p>
+                </div>
+                <div class="p-6 bg-slate-50 rounded-xl hover:shadow-lg transition group">
+                    <div class="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-orange-600 transition">
+                        <i class="fa-solid fa-file-pdf text-2xl text-orange-600 group-hover:text-white transition"></i>
+                    </div>
+                    <h3 class="font-bold text-xl mb-2">高畫質輸出</h3>
+                    <p class="text-slate-500 text-sm">可以存成 PDF 或 SVG 向量圖，放大一萬倍看細節都不會模糊，這對發表論文很重要！</p>
+                </div>
+                <div class="p-6 bg-slate-50 rounded-xl hover:shadow-lg transition group">
+                    <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-green-600 transition">
+                        <i class="fa-solid fa-database text-2xl text-green-600 group-hover:text-white transition"></i>
+                    </div>
+                    <h3 class="font-bold text-xl mb-2">數據好朋友</h3>
+                    <p class="text-slate-500 text-sm">完美支援 Pandas 和 Xarray。如果你有 Excel 整理好的地震資料，一行指令就能讀進去。</p>
+                </div>
+            </div>
+
+            <div class="mt-16 bg-slate-900 text-white rounded-3xl p-8 flex flex-col md:flex-row items-center justify-between gap-6" data-aos="zoom-in">
+                <div>
+                    <h3 class="text-2xl font-bold mb-2">準備好深入研究了嗎？</h3>
+                    <p class="text-slate-400">訪問 PyGMT 官方網站，那裡有完整的寶典。</p>
+                </div>
+                <a href="https://www.pygmt.org/latest/" target="_blank" class="bg-white text-slate-900 px-8 py-3 rounded-xl font-bold hover:bg-blue-50 transition flex items-center gap-2">
+                    前往官網 <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <footer class="bg-slate-100 border-t border-slate-200 py-10 text-center">
+        <p class="text-slate-500 font-medium">
+            Made with <i class="fa-solid fa-heart text-red-400 animate-pulse"></i> by Gemini AI Researcher
+        </p>
+        <p class="text-xs text-slate-400 mt-2">
+            此網頁為教育推廣用途，相關商標與內容屬於 <a href="https://www.pygmt.org/" class="underline hover:text-blue-500">PyGMT Team</a> 所有。
+        </p>
+    </footer>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        // 初始化動畫庫
+        AOS.init({ duration: 800, once: true });
+
+        // Alpine.js 邏輯 (互動實驗室的核心)
+        function mapLab() {
+            return {
+                projection: 'Mercator', // Mercator or Orthographic
+                content: 'Simple',      // Simple or Relief
+                overlay: false,         // True/False
+                
+                generateCode() {
+                    let code = `import pygmt\n\nfig = pygmt.Figure()\n`;
+                    
+                    // 1. 設定底圖與投影
+                    let projCode = this.projection === 'Mercator' ? 'M15c' : 'G-60/10/15c';
+                    let region = this.projection === 'Mercator' ? 'region="world", ' : 'region="g", ';
+                    
+                    if (this.content === 'Simple') {
+                        code += `# 繪製海岸線\nfig.coast(\n    ${region}projection="${projCode}",\n    land="lightgray",\n    water="azure",\n    frame=True\n)\n`;
+                    } else {
+                        code += `# 繪製地形 (Earth Relief)\nfig.grdimage(\n    grid="@earth_relief_05m",\n    ${region}projection="${projCode}",\n    cmap="geo"\n)\n`;
+                    }
+
+                    // 2. 設定疊加層
+                    if (this.overlay) {
+                        code += `\n# 疊加地震點\nfig.plot(\n    data="quakes.txt",\n    style="c0.2c",\n    color="red",\n    pen="black"\n)\n`;
+                    }
+
+                    code += `\nfig.show()`;
+                    return code;
+                }
+            }
+        }
+    </script>
+</body>
+</html>
