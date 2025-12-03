@@ -3,597 +3,416 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PyGMT: 讓地圖繪製變得簡單又優雅</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
-    
+    <title>PyGMT 探索之旅：你的地圖魔法師</title>
     <style>
-        /* --- 1. Design System (設計系統) --- */
         :root {
-            --bg-deep: #050914;       /* 深淵黑 */
-            --bg-surface: #0f1629;    /* 介面深藍 */
-            --bg-card: #16203c;       /* 卡片藍 */
-            
-            --primary: #0ea5e9;       /* 科技藍 */
-            --primary-glow: rgba(14, 165, 233, 0.4);
-            --accent: #d946ef;        /* 霓虹紫 */
-            --success: #10b981;       /* 執行成功綠 */
-            
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            
-            --font-main: 'Inter', sans-serif;
-            --font-code: 'Fira Code', monospace;
-            
-            --radius-lg: 16px;
-            --radius-sm: 8px;
+            --bg-color: #0d1117;
+            --card-bg: #161b22;
+            --text-main: #c9d1d9;
+            --accent-color: #58a6ff;
+            --accent-hover: #1f6feb;
+            --code-bg: #21262d;
+            --success: #2ea043;
         }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
-        html { scroll-behavior: smooth; }
 
         body {
-            background-color: var(--bg-deep);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
             color: var(--text-main);
-            font-family: var(--font-main);
-            line-height: 1.8;
-            overflow-x: hidden;
+            margin: 0;
+            line-height: 1.6;
         }
 
-        /* --- 2. 背景特效 (Dynamic Background) --- */
-        .bg-grid {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
-            background-image: 
-                linear-gradient(rgba(14, 165, 233, 0.05) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(14, 165, 233, 0.05) 1px, transparent 1px);
-            background-size: 50px 50px;
-            mask-image: radial-gradient(circle at center, black 40%, transparent 100%);
-            transform: perspective(1000px) rotateX(20deg) scale(1.2);
-            animation: gridFloat 60s linear infinite;
-        }
-        
-        @keyframes gridFloat { 0% { background-position: 0 0; } 100% { background-position: 0 500px; } }
-
-        /* --- 3. UI Components --- */
-        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
-        
-        /* 導航 */
-        nav {
-            padding: 20px 0;
-            display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            background: rgba(5, 9, 20, 0.8);
-            backdrop-filter: blur(10px);
-            position: sticky; top: 0; z-index: 100;
-        }
-        .logo { font-weight: 900; font-size: 1.5rem; letter-spacing: -1px; display: flex; align-items: center; gap: 10px; }
-        .logo span { color: var(--primary); }
-        .nav-tag { font-family: var(--font-code); font-size: 0.8rem; color: var(--text-muted); background: rgba(255,255,255,0.05); padding: 4px 8px; border-radius: 4px; }
-
-        /* --- 4. Hero Section --- */
-        section.hero {
-            min-height: 85vh;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
+        /* Header */
+        header {
+            background: linear-gradient(135deg, #1f6feb 0%, #0d1117 100%);
+            padding: 3rem 1rem;
             text-align: center;
-            position: relative;
-        }
-        
-        h1 {
-            font-size: clamp(2.5rem, 6vw, 4.5rem);
-            line-height: 1.2;
-            font-weight: 800;
-            background: linear-gradient(to bottom right, #fff 30%, var(--primary));
-            /* 修復部分：增加標準屬性以解決警告 */
-            background-clip: text; 
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            
-            margin-bottom: 25px;
-            animation: slideUp 1s cubic-bezier(0.2, 0.8, 0.2, 1);
+            border-bottom: 1px solid #30363d;
         }
 
-        .subtitle {
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            color: #ffffff;
+        }
+
+        header p {
             font-size: 1.2rem;
-            color: var(--text-muted);
-            max-width: 750px;
-            margin-bottom: 40px;
-            animation: slideUp 1s 0.2s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
         }
 
-        .scroll-indicator {
-            position: absolute; bottom: 40px;
-            animation: bounce 2s infinite;
-            opacity: 0.5;
-            font-size: 0.9rem; letter-spacing: 1px;
+        /* Container */
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
         }
 
-        /* --- 5. 淺顯介紹 (Intro) --- */
-        section.intro { padding: 100px 0; }
-        
-        .section-header { margin-bottom: 60px; text-align: left; }
-        .section-header h2 { font-size: 2.5rem; margin-bottom: 15px; }
-        .section-header .line { width: 60px; height: 4px; background: var(--primary); border-radius: 2px; }
-
-        .feature-grid {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 40px;
+        /* Sections */
+        section {
+            margin-bottom: 4rem;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeIn 0.8s forwards;
         }
 
-        .feature-card {
-            background: var(--bg-card);
-            padding: 40px;
-            border-radius: var(--radius-lg);
-            border: 1px solid rgba(255,255,255,0.05);
-            transition: 0.3s;
-            position: relative;
-            overflow: hidden;
-        }
-        .feature-card:hover { transform: translateY(-10px); border-color: var(--primary); box-shadow: 0 20px 40px -10px rgba(0,0,0,0.5); }
-        
-        .icon-box {
-            width: 50px; height: 50px; background: rgba(14, 165, 233, 0.1);
-            color: var(--primary); border-radius: 12px; display: flex; align-items: center; justify-content: center;
-            font-size: 1.5rem; margin-bottom: 20px;
+        h2 {
+            border-left: 5px solid var(--accent-color);
+            padding-left: 1rem;
+            color: #ffffff;
+            margin-bottom: 1.5rem;
         }
 
-        .card-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 15px; color: #fff; }
-        .card-text { color: var(--text-muted); font-size: 1rem; }
-
-        /* --- 6. AGU 2021 Analysis (Timeline Style) --- */
-        section.analysis { background: var(--bg-surface); padding: 100px 0; border-top: 1px solid rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.05); }
-
-        .timeline { position: relative; max-width: 800px; margin: 0 auto; }
-        .timeline::before {
-            content: ''; position: absolute; left: 0; top: 0; width: 2px; height: 100%;
-            background: linear-gradient(to bottom, var(--primary), var(--accent));
-        }
-
-        .timeline-item { margin-left: 40px; margin-bottom: 60px; position: relative; opacity: 0; transform: translateX(-20px); transition: 0.6s; }
-        .timeline-item.visible { opacity: 1; transform: translateX(0); }
-        
-        .timeline-marker {
-            position: absolute; left: -49px; top: 0;
-            width: 20px; height: 20px; border-radius: 50%;
-            background: var(--bg-deep); border: 2px solid var(--primary);
-            box-shadow: 0 0 15px var(--primary);
-        }
-
-        .video-box {
-            background: rgba(0,0,0,0.3); padding: 20px; border-radius: var(--radius-sm);
-            border-left: 4px solid var(--accent); margin-top: 20px;
-        }
-        .code-inline {
-            font-family: var(--font-code); color: var(--accent); background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px; font-size: 0.9em;
-        }
-
-        /* --- 7. 互動實作區 (Interactive Lab) --- */
-        section.lab { padding: 100px 0; }
-
-        .lab-layout {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 50px; align-items: start;
-        }
-        @media(max-width: 900px) { .lab-layout { grid-template-columns: 1fr; } }
-
-        /* IDE 模擬器 */
-        .ide-window {
-            background: #0d1117;
-            border-radius: var(--radius-lg);
+        /* Card Style */
+        .card {
+            background-color: var(--card-bg);
             border: 1px solid #30363d;
-            box-shadow: 0 30px 60px rgba(0,0,0,0.5);
-            font-family: var(--font-code);
-            overflow: hidden;
-            display: flex; flex-direction: column;
-            height: 500px;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
         }
 
-        .ide-header {
-            background: #161b22; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #30363d; flex-shrink: 0;
+        .highlight-text {
+            color: var(--accent-color);
+            font-weight: bold;
         }
-        .window-controls { display: flex; gap: 8px; }
-        .ctrl { width: 12px; height: 12px; border-radius: 50%; }
-        .ctrl.cl { background: #ff5f56; } .ctrl.mi { background: #ffbd2e; } .ctrl.ex { background: #27c93f; }
-        
-        .run-btn {
-            background: #238636; color: white; border: none; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 0.85rem; display: flex; align-items: center; gap: 6px; transition: 0.2s; font-family: var(--font-main); font-weight: 600;
-        }
-        .run-btn:hover { background: #2ea043; transform: scale(1.05); }
-        .run-btn svg { width: 14px; height: 14px; fill: currentColor; }
 
-        .ide-content { padding: 20px; color: #c9d1d9; font-size: 0.9rem; overflow-y: auto; flex-grow: 1; line-height: 1.6; }
-        .ln { color: #484f58; margin-right: 15px; user-select: none; display: inline-block; width: 20px; text-align: right; }
-        .k { color: #ff7b72; } /* Keyword */
-        .f { color: #d2a8ff; } /* Function */
-        .s { color: #a5d6ff; } /* String */
-        .c { color: #8b949e; font-style: italic; } /* Comment */
-
-        /* 結果顯示區 */
-        .result-viewer {
-            border: 2px dashed rgba(255,255,255,0.1);
-            border-radius: var(--radius-lg);
-            height: 500px;
-            display: flex; flex-direction: column;
-            align-items: center; justify-content: center;
+        /* Video Section */
+        .video-container {
             position: relative;
-            background: rgba(0,0,0,0.2);
-            transition: 0.3s;
+            padding-bottom: 56.25%; /* 16:9 ratio */
+            height: 0;
             overflow: hidden;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            border: 1px solid #30363d;
         }
-        
-        /* 模擬終端機輸出 */
-        .terminal-output {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: #0d1117; padding: 20px;
-            font-family: var(--font-code); font-size: 0.8rem; color: #4ade80;
-            display: none; text-align: left;
-        }
-        .terminal-line { margin-bottom: 5px; opacity: 0; animation: fadeIn 0.2s forwards; }
 
-        /* 進度條 */
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Simulator Styles */
+        .terminal-window {
+            background-color: var(--code-bg);
+            border-radius: 8px;
+            border: 1px solid #30363d;
+            overflow: hidden;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        .terminal-header {
+            background-color: #161b22;
+            padding: 0.5rem 1rem;
+            display: flex;
+            gap: 8px;
+            border-bottom: 1px solid #30363d;
+        }
+
+        .dot { width: 12px; height: 12px; border-radius: 50%; }
+        .red { background-color: #ff5f56; }
+        .yellow { background-color: #ffbd2e; }
+        .green { background-color: #27c93f; }
+
+        .code-area {
+            padding: 1.5rem;
+            color: #e6edf3;
+            font-size: 0.95rem;
+            white-space: pre-wrap;
+        }
+
+        .keyword { color: #ff7b72; }
+        .string { color: #a5d6ff; }
+        .function { color: #d2a8ff; }
+
+        .control-panel {
+            padding: 1rem;
+            background-color: var(--card-bg);
+            border-top: 1px solid #30363d;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        button#runBtn {
+            background-color: var(--success);
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 6px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: transform 0.1s, background-color 0.2s;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        button#runBtn:hover {
+            background-color: #26893c;
+            transform: scale(1.05);
+        }
+
+        button#runBtn:disabled {
+            background-color: #484f58;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Progress Bar */
         .progress-container {
-            width: 60%; height: 4px; background: #30363d; border-radius: 2px; margin-top: 10px; display: none;
-        }
-        .progress-bar {
-            height: 100%; background: var(--primary); width: 0%; border-radius: 2px;
-            transition: width 0.2s;
-        }
-
-        .final-image {
-            max-width: 90%; max-height: 90%; border-radius: 8px; box-shadow: 0 0 40px rgba(14, 165, 233, 0.2);
-            opacity: 0; transform: scale(0.9); transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            width: 100%;
+            height: 6px;
+            background-color: #30363d;
+            border-radius: 3px;
+            margin-top: 15px;
             display: none;
-        }
-        .final-image.show { opacity: 1; transform: scale(1); display: block; }
-
-        /* --- 8. PyGMT Official Invite (Fun & Active) --- */
-        section.invite-party {
-            margin: 80px 0 120px;
-            text-align: center;
-            position: relative;
-        }
-        
-        .party-card {
-            background: linear-gradient(145deg, rgba(20, 30, 60, 0.9), rgba(10, 15, 30, 0.95));
-            border: 2px solid transparent;
-            background-clip: padding-box;
-            border-radius: 24px;
-            padding: 60px 30px;
-            position: relative;
-            z-index: 1;
             overflow: hidden;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-            transition: 0.3s;
-        }
-        /* Border Gradient Hack */
-        .party-card::before {
-            content: ''; position: absolute; top: 0; right: 0; bottom: 0; left: 0; z-index: -1; margin: -2px; border-radius: inherit;
-            background: linear-gradient(45deg, var(--primary), var(--accent), var(--primary));
-            animation: borderRun 5s linear infinite;
         }
 
-        .party-title {
-            font-size: 2.8rem; font-weight: 900; margin-bottom: 20px;
-            background: linear-gradient(to right, #fff, var(--primary));
-            /* 修復部分：增加標準屬性以解決警告 */
-            background-clip: text;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        
-        .party-text {
-            font-size: 1.2rem; color: #cbd5e1; max-width: 650px; margin: 0 auto 40px;
-        }
-        
-        .fun-badges { display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; margin-bottom: 40px; }
-        .badge {
-            background: rgba(255,255,255,0.1); padding: 8px 16px; border-radius: 50px; font-weight: bold; font-size: 0.9rem; color: var(--accent);
-            display: flex; align-items: center; gap: 8px; border: 1px solid rgba(255,255,255,0.1);
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background-color: var(--accent-color);
+            transition: width 0.2s ease-in-out;
+            box-shadow: 0 0 10px var(--accent-color);
         }
 
-        .mega-btn {
-            display: inline-block; padding: 18px 50px;
-            background: var(--primary); color: white;
-            font-size: 1.3rem; font-weight: 800; border-radius: 50px;
+        .console-log {
+            margin-top: 10px;
+            font-size: 0.85rem;
+            color: #8b949e;
+            height: 20px;
+        }
+
+        /* Result Image */
+        #result-area {
+            margin-top: 2rem;
+            text-align: center;
+            display: none;
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        #result-area img {
+            max-width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(88, 166, 255, 0.2);
+            border: 2px solid var(--accent-color);
+        }
+
+        /* Links */
+        .resource-links a {
+            display: block;
+            background-color: var(--code-bg);
+            color: var(--accent-color);
             text-decoration: none;
-            box-shadow: 0 0 20px var(--primary-glow);
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            position: relative; top: 0;
-        }
-        .mega-btn:hover {
-            background: #fff; color: var(--primary);
-            box-shadow: 0 0 50px white;
-            transform: scale(1.05) translateY(-5px);
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            border-radius: 6px;
+            transition: background 0.2s;
         }
 
-        @keyframes borderRun { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
-        @keyframes fadeIn { to { opacity: 1; } }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(10px); } }
+        .resource-links a:hover {
+            background-color: #30363d;
+        }
 
-        footer { text-align: center; padding: 60px 0; color: var(--text-muted); font-size: 0.9rem; border-top: 1px solid rgba(255,255,255,0.05); }
-        a.ref-link { color: var(--primary); text-decoration: none; transition:0.2s; border-bottom: 1px dashed var(--primary); }
-        a.ref-link:hover { color: var(--accent); border-bottom-style: solid; }
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: #8b949e;
+            font-size: 0.9rem;
+            border-top: 1px solid #30363d;
+        }
 
+        /* Animations */
+        @keyframes fadeIn {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes popIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        @media (max-width: 600px) {
+            header h1 { font-size: 1.8rem; }
+            .card { padding: 1.5rem; }
+        }
     </style>
 </head>
 <body>
 
-    <div class="bg-grid"></div>
+<header>
+    <h1>🌍 PyGMT 實驗室</h1>
+    <p>用程式碼畫出全世界，探索地理資料視覺化的無限可能。</p>
+</header>
 
-    <div class="container">
-        <nav>
-            <div class="logo">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <path d="M2 12h20"></path>
-                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1 4-10z"></path>
-                </svg>
-                Py<span>GMT</span>
+<div class="container">
+
+    <section>
+        <h2>🤔 PyGMT 是什麼？</h2>
+        <div class="card">
+            <p>想像一下，如果我們想畫出一張精美的世界地圖，通常需要複雜的軟體操作。但 <strong>PyGMT</strong> 就像是一個給 Python 程式語言使用的<span class="highlight-text">「數位畫筆」</span>。</p>
+            <p>它是科學界著名的繪圖工具 <strong>GMT (Generic Mapping Tools)</strong> 的 Python 版本。簡單來說：</p>
+            <ul>
+                <li>📊 <strong>處理數據</strong>：它可以讀取地形、地震、氣溫等各種科學數據。</li>
+                <li>🗺️ <strong>繪製地圖</strong>：從簡單的海岸線到複雜的3D地形圖都能搞定。</li>
+                <li>🎨 <strong>美觀專業</strong>：產出的圖片品質極高，常被用於國際期刊發表。</li>
+            </ul>
+            <p>對於一般人來說，它讓我們能用幾行程式碼，就把枯燥的 Excel 數據變成漂亮的地理圖表！</p>
+        </div>
+    </section>
+
+    <section>
+        <h2>📺 3分鐘快速入門</h2>
+        <div class="card">
+            <p>這部來自 AGU 2021 的影片展示了 PyGMT 的核心操作邏輯。不需要是電腦專家，也能看出它的便利性。</p>
+            
+            <div class="video-container">
+                <iframe src="https://www.youtube.com/embed/Kb6TYvZcI_c" title="PyGMT Introduction" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
             </div>
-            <div class="nav-tag">Interactive Documentation</div>
-        </nav>
 
-        <section class="hero">
-            <h1>Map the Earth,<br>Pythonically.</h1>
-            <p class="subtitle">
-                PyGMT 是地球科學家的「魔法畫筆」。<br>
-                想像一下，不需要學習艱澀難懂的指令，只要寫幾行 Python 程式碼，<br>
-                就能畫出具有學術期刊水準、精美絕倫的世界地圖。
-            </p>
-            <div class="scroll-indicator">↓ 往下滾動，開始探索</div>
-        </section>
+            <h3>💡 影片重點分析：</h3>
+            <ul>
+                <li><strong>模組化設計 (Modules)</strong>：PyGMT 將複雜的功能包裝成簡單的指令（例如 <code>fig.coast</code> 用來畫海岸線）。</li>
+                <li><strong>圖層概念 (Layering)</strong>：畫地圖就像做三明治，先畫底圖，再疊上海洋，最後疊上數據點。</li>
+                <li><strong>投影法 (Projections)</strong>：影片中展示了如何輕鬆切換不同的地圖投影（例如把地球變成平面的麥卡托投影，或是圓形的極地投影）。</li>
+            </ul>
+        </div>
+    </section>
 
-        <section class="intro">
-            <div class="section-header">
-                <h2>什麼是 PyGMT?</h2>
-                <div class="line"></div>
+    <section>
+        <h2>🛠️ 動手試試看：PyGMT 模擬器</h2>
+        <p>不用安裝軟體，在下方點擊 <strong>Run Code</strong>，體驗電腦繪製地圖的過程！</p>
+        
+        <div class="terminal-window">
+            <div class="terminal-header">
+                <div class="dot red"></div>
+                <div class="dot yellow"></div>
+                <div class="dot green"></div>
+                <span style="font-size: 0.8rem; margin-left: 10px; color: #8b949e;">main.py - PyGMT Simulator</span>
             </div>
             
-            <div class="feature-grid">
-                <div class="feature-card">
-                    <div class="icon-box">🐍</div>
-                    <h3 class="card-title">Python 的簡潔優雅</h3>
-                    <p class="card-text">
-                        你懂 Python，你就懂 PyGMT。它就像一個貼心的翻譯官，把你習慣的 DataFrame 數據表或 Xarray 網格資料，直接轉換成地圖語言，不用再為了轉檔頭痛。
-                    </p>
-                </div>
-                <div class="feature-card">
-                    <div class="icon-box">🌍</div>
-                    <h3 class="card-title">繼承 GMT 的強大基因</h3>
-                    <p class="card-text">
-                        它的核心是傳奇軟體 <strong>GMT</strong>。這意味著擁有處理海量地形數據、30 多種專業地圖投影的能力。從聖母峰到馬里亞納海溝，細節絕不馬虎。
-                    </p>
-                </div>
-                <div class="feature-card">
-                    <div class="icon-box">📊</div>
-                    <h3 class="card-title">發表級的精美圖片</h3>
-                    <p class="card-text">
-                        專為論文發表而生。自動化的比例尺、指北針，支援輸出 PDF、EPS 向量圖檔。你的地圖將會是論文中最吸睛的亮點，隨時準備好投稿 Nature 或 Science。
-                    </p>
-                </div>
-            </div>
-        </section>
+            <div class="code-area">
+<span class="keyword">import</span> pygmt
 
-        <section class="analysis">
-            <div class="container">
-                <div class="section-header">
-                    <h2>AGU 2021 演講精華解析</h2>
-                    <p style="color:var(--text-muted)">基於 Liam Toney 的演講 "Quick Introduction to Plotting with PyGMT"</p>
-                    <div class="line"></div>
-                </div>
+<span class="comment"># 1. 創建一張畫布</span>
+fig = pygmt.<span class="function">Figure</span>()
 
-                <div class="timeline">
-                    <div class="timeline-item reveal-on-scroll">
-                        <div class="timeline-marker"></div>
-                        <h3 style="font-size:1.5rem; margin-bottom:10px;">01. 建立畫布 (The Canvas)</h3>
-                        <p style="color:var(--text-muted)">
-                            影片一開始展示了基礎。在 PyGMT 中，一切從 <code class="code-inline">fig = pygmt.Figure()</code> 開始。
-                            這就像是拿出一張白紙，所有的繪圖動作（畫海岸線、畫點、填色）都是在這個物件上進行，邏輯非常直觀。
-                        </p>
-                    </div>
+<span class="comment"># 2. 繪製海岸線與海洋 (全世界地圖)</span>
+<span class="comment"># region="g" 代表 Global (全球)</span>
+<span class="comment"># projection="W15c" 代表使用 Mollweide 投影法</span>
+fig.<span class="function">coast</span>(
+    region=<span class="string">"g"</span>,
+    projection=<span class="string">"W15c"</span>,
+    land=<span class="string">"lightgray"</span>,
+    water=<span class="string">"skyblue"</span>,
+    frame=<span class="string">True</span>
+)
 
-                    <div class="timeline-item reveal-on-scroll">
-                        <div class="timeline-marker"></div>
-                        <h3 style="font-size:1.5rem; margin-bottom:10px;">02. 投影與海岸線 (Projection)</h3>
-                        <p style="color:var(--text-muted)">
-                            演講者強調了「投影」的重要性。透過 <code class="code-inline">fig.coast()</code>，我們不僅能畫出陸地輪廓，
-                            還能透過 <code class="code-inline">projection</code> 參數（如 Mercator 或 Orthographic）瞬間改變地圖的幾何視角，這在傳統軟體中通常很困難。
-                        </p>
-                    </div>
-
-                    <div class="timeline-item reveal-on-scroll">
-                        <div class="timeline-marker"></div>
-                        <h3 style="font-size:1.5rem; margin-bottom:10px;">03. 數據疊加與地形 (Data Overlay)</h3>
-                        <p style="color:var(--text-muted)">
-                            這是最精彩的部分！影片約 4 分鐘處展示了如何載入遠端數據。
-                            不需要手動下載數 GB 的檔案，PyGMT 會自動從伺服器串流下載 <code class="code-inline">@earth_relief</code> 地形資料，
-                            一行程式碼就能渲染出絢麗的全球地形圖。
-                        </p>
-                        <div class="video-box">
-                            <strong style="color:var(--primary)">影片亮點：</strong> 
-                            從空白畫布到一張完整的全球地形圖，影片中僅用了不到 10 行程式碼，完美展現了 PyGMT 的高效。
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section class="lab">
-            <div class="section-header">
-                <h2>互動實驗室 (Interactive Lab)</h2>
-                <div class="line"></div>
-                <p style="color:var(--text-muted); margin-top:10px;">
-                    別只是看，動手試試！點擊「Run Code」模擬程式執行，見證 PyGMT 將程式碼變成藝術品的過程。
-                </p>
+<span class="comment"># 3. 顯示圖片</span>
+fig.<span class="function">show</span>()
             </div>
 
-            <div class="lab-layout">
-                <div class="ide-window">
-                    <div class="ide-header">
-                        <div class="window-controls">
-                            <div class="ctrl cl"></div><div class="ctrl mi"></div><div class="ctrl ex"></div>
-                        </div>
-                        <div style="font-size:0.8rem; color:#8b949e;">demo_plot.py</div>
-                        <button class="run-btn" onclick="runSimulation()">
-                            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg> Run Code
-                        </button>
-                    </div>
-                    <div class="ide-content" id="codeBlock">
-<span class="ln">1</span><span class="k">import</span> pygmt
-
-<span class="ln">2</span><span class="c"># 載入遠端地球地形數據 (20角分解析度)</span>
-<span class="ln">3</span>grid = <span class="s">"@earth_relief_20m"</span>
-
-<span class="ln">4</span><span class="c"># 初始化畫布</span>
-<span class="ln">5</span>fig = pygmt.<span class="f">Figure</span>()
-
-<span class="ln">6</span><span class="c"># 使用 Winkel Tripel 投影法繪製地圖</span>
-<span class="ln">7</span><span class="c"># projection="R12c" 代表寬度 12 公分</span>
-<span class="ln">8</span>fig.<span class="f">grdimage</span>(
-<span class="ln">9</span>    grid=grid,
-<span class="ln">10</span>    projection=<span class="s">"R12c"</span>,
-<span class="ln">11</span>    frame=<span class="s">"a"</span>,  <span class="c"># 自動添加邊框刻度</span>
-<span class="ln">12</span>    cmap=<span class="s">"geo"</span>  <span class="c"># 使用地理專用配色</span>
-<span class="ln">13</span>)
-
-<span class="ln">14</span><span class="c"># 顯示並儲存結果</span>
-<span class="ln">15</span>fig.<span class="f">show</span>()
-                    </div>
-                </div>
-
-                <div class="result-viewer" id="resultViewer">
-                    <div style="color:var(--text-muted); font-size:0.9rem;" id="placeholderText">
-                        等待執行指令...<br>請點擊左上角的 "Run Code" 按鈕。
-                    </div>
-                    
-                    <div class="terminal-output" id="terminal">
-                        <div class="terminal-line">> python demo_plot.py</div>
-                        <div class="progress-container" id="progressBarContainer">
-                            <div class="progress-bar" id="progressBar"></div>
-                        </div>
-                        <div id="terminalLog"></div>
-                    </div>
-
-                    <img src="assret/pygmt_demo.png" alt="PyGMT Output Map" class="final-image" id="finalImage">
-                </div>
-            </div>
-        </section>
-
-        <section class="invite-party reveal-on-scroll">
-            <div class="party-card">
-                <h2 class="party-title">覺得意猶未盡嗎？</h2>
+            <div class="control-panel">
+                <button id="runBtn" onclick="runSimulation()">
+                    <span>▶ Run Code</span>
+                </button>
                 
-                <div class="fun-badges">
-                    <span class="badge">🚀 複製貼上就能跑</span>
-                    <span class="badge">🎨 靈感畫廊</span>
-                    <span class="badge">📚 大神修煉手冊</span>
+                <div class="progress-container">
+                    <div class="progress-bar" id="progressBar"></div>
                 </div>
-
-                <p class="party-text">
-                    PyGMT 的官網就像是一個巨大的寶藏庫！<br>
-                    別再自己造輪子了，這裡有數百個範例代碼 (Gallery) 等你來「借鑒」。<br>
-                    無論是想畫地震機制解、3D 地形圖還是衛星軌道，官方文檔都幫你準備好了！
-                </p>
-
-                <a href="https://www.pygmt.org/latest/" target="_blank" class="mega-btn">
-                    帶我去官方尋寶！➜
-                </a>
+                <div class="console-log" id="consoleLog"></div>
             </div>
-        </section>
+        </div>
+
+        <div id="result-area">
+            <h3 style="color: var(--success);">🎉 生成成功！ (Success)</h3>
+            <p>這就是剛剛程式碼產生的地圖：</p>
+            <img src="./docs/assets/map_preview.png" alt="PyGMT 生成的地圖" onerror="this.src='https://docs.pygmt.org/latest/_images/gallery_coast_land_and_water.png'; this.alt='(本地圖片未找到，顯示範例圖片)';">
+            <p style="font-size: 0.8rem; color: #8b949e; margin-top: 0.5rem;">* 如果無法顯示，請確認 docs/assets 資料夾內是否有圖片。</p>
+        </div>
+    </section>
+
+    <section>
+        <h2>📚 進階學習資源</h2>
+        <div class="card resource-links">
+            <p>PyGMT 擁有非常活躍的開源社群與完整的文檔，想要深入研究可以參考：</p>
+            <a href="https://www.pygmt.org/latest/" target="_blank">🔗 <strong>PyGMT 官方網站</strong> <br><small>最權威的技術文檔與安裝指南</small></a>
+            <a href="https://www.pygmt.org/latest/gallery/index.html" target="_blank">🖼️ <strong>範例藝廊 (Gallery)</strong> <br><small>看看別人用 PyGMT 畫出了什麼驚人的圖</small></a>
+            <a href="https://github.com/GenericMappingTools/pygmt" target="_blank">💻 <strong>GitHub 原始碼</strong> <br><small>程式設計師的交流基地</small></a>
+        </div>
+    </section>
+
+</div>
+
+<footer>
+    <p>Designed with ❤️ by PyGMT Enthusiast | © 2024</p>
+    <p style="font-size: 0.8rem;">Disclaimer: This is a demo page for educational purposes.</p>
+</footer>
+
+<script>
+    function runSimulation() {
+        const btn = document.getElementById('runBtn');
+        const progressBar = document.getElementById('progressBar');
+        const progressContainer = document.querySelector('.progress-container');
+        const consoleLog = document.getElementById('consoleLog');
+        const resultArea = document.getElementById('result-area');
+
+        // Reset
+        resultArea.style.display = 'none';
+        btn.disabled = true;
+        btn.innerHTML = '⏳ Compiling...';
+        progressContainer.style.display = 'block';
+        progressBar.style.width = '0%';
         
-        <footer>
-            <p>Designed with 💙 for PyGMT Learners</p>
-            <p style="margin-top:10px; font-size:0.8rem;">
-                Resources: <a href="https://www.pygmt.org" target="_blank" class="ref-link">PyGMT Official Website</a> | 
-                <a href="https://www.youtube.com/watch?v=Kb6TYvZcI_c" target="_blank" class="ref-link">AGU 2021 Video</a>
-            </p>
-        </footer>
+        // Simulation Steps
+        const steps = [
+            { width: '20%', msg: 'Importing pygmt library...' },
+            { width: '45%', msg: 'Downloading earth relief data...' },
+            { width: '70%', msg: 'Processing map projection (Mollweide)...' },
+            { width: '90%', msg: 'Rendering layers: Coast, Water, Land...' },
+            { width: '100%', msg: 'Done!' }
+        ];
 
-    </div>
+        let currentStep = 0;
 
-    <script>
-        // 1. 滾動顯示動畫 (Scroll Animation)
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('visible');
-                }
-            });
-        }, { threshold: 0.1 });
+        const interval = setInterval(() => {
+            if (currentStep >= steps.length) {
+                clearInterval(interval);
+                finishSimulation();
+            } else {
+                progressBar.style.width = steps[currentStep].width;
+                consoleLog.innerText = '> ' + steps[currentStep].msg;
+                currentStep++;
+            }
+        }, 600); // 模擬每 0.6 秒跑一個進度
 
-        document.querySelectorAll('.reveal-on-scroll').forEach(el => observer.observe(el));
-
-        // 2. 程式執行模擬 (Code Execution Simulation)
-        function runSimulation() {
-            const placeholder = document.getElementById('placeholderText');
-            const terminal = document.getElementById('terminal');
-            const terminalLog = document.getElementById('terminalLog');
-            const progressBar = document.getElementById('progressBar');
-            const progressContainer = document.getElementById('progressBarContainer');
-            const img = document.getElementById('finalImage');
-            const viewer = document.getElementById('resultViewer');
-
-            // 重置狀態
-            img.classList.remove('show');
-            img.style.display = 'none';
-            placeholder.style.display = 'none';
-            terminal.style.display = 'block';
-            terminalLog.innerHTML = '';
-            progressBar.style.width = '0%';
-            progressContainer.style.display = 'block';
-            viewer.style.borderColor = 'rgba(255,255,255,0.1)';
-            viewer.style.boxShadow = 'none';
-
-            // 模擬日誌步驟
-            const steps = [
-                { msg: "Importing pygmt module...", delay: 500 },
-                { msg: "Fetching remote dataset '@earth_relief_20m'...", delay: 1200 },
-                { msg: "Processing grid data...", delay: 2000 },
-                { msg: "Applying Winkel Tripel projection (R12c)...", delay: 2800 },
-                { msg: "Rendering colormap 'geo'...", delay: 3500 },
-                { msg: "Finalizing plot generation...", delay: 4200 },
-                { msg: "Done!", delay: 4500 }
-            ];
-
-            // 執行進度條動畫
-            setTimeout(() => { progressBar.style.width = '100%'; }, 100);
-
-            // 執行文字日誌動畫
-            steps.forEach(step => {
-                setTimeout(() => {
-                    const div = document.createElement('div');
-                    div.className = 'terminal-line';
-                    div.textContent = step.msg;
-                    terminalLog.appendChild(div);
-                    // 自動捲動到底部
-                    terminal.scrollTop = terminal.scrollHeight;
-                }, step.delay);
-            });
-
-            // 顯示最終圖片
+        function finishSimulation() {
             setTimeout(() => {
-                terminal.style.display = 'none'; // 隱藏終端機
-                img.style.display = 'block';
-                // 強制重繪以觸發 fade-in
-                void img.offsetWidth; 
-                img.classList.add('show');
-                viewer.style.borderColor = 'var(--success)';
-                viewer.style.boxShadow = '0 0 20px rgba(16, 185, 129, 0.2)';
-            }, 4800);
-        }
+                btn.innerHTML = '✔ Completed';
+                btn.style.backgroundColor = '#484f58'; // Grey out button
+                consoleLog.innerText = '> Image generated successfully.';
+                
+                // Show Result
+                resultArea.style.display = 'block';
+                
+                // Scroll to result smoothly
+                resultArea.scrollIntoView({ behavior: 'smooth' });
 
-        // 3. 卡片 3D 傾斜特效 (Dynamic Tilt Effect)
-        document.querySelectorAll('.feature-card').forEach(card => {
-            card.addEventListener('mousemove', (e) => {
-                const rect = card.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
-                card.style.background = `radial-gradient(circle at ${x}px ${y}px, rgba(255,255,255,0.05), var(--bg-card))`;
-            });
-            card.addEventListener('mouseleave', () => {
-                card.style.background = 'var(--bg-card)';
-            });
-        });
-    </script>
+            }, 500);
+        }
+    }
+</script>
+
 </body>
 </html>
